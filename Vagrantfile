@@ -1,168 +1,71 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# This is intended to be a drop-in Vagrantfile, which reads VM configurations
-# from a yaml file (vagrant.yml) in the root directory.
-# It supports vagrant cloud boxes and traditional boxes
-# See the README for more thorough documentation.
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
 
-# We're going to read from yaml files, so we gots to know how to yaml
-require 'yaml'
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "slalompdx/centos-7-puppet4"
 
-# Print an error message and stop execution on handled errors
-def handle_error(error_msg)
-  puts "ERROR: #{error_msg}"
-  exit
-end
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
 
-# Check the "nodes" element from vagrant.yml for existence and completeness
-def verify_nodes(nodes)
-  # Make sure that at least one node is defined
-  if !nodes || nodes.empty?
-    error_msg = 'No nodes defined in vagrant.yml'
-    handle_error(error_msg)
-  end
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
 
-  # TODO: Add per-node checks for completeness
-  #       Build up one big error message with all failed checks
-end
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
 
-# Convert the shell provisioner arguments from vagrant.yml
-# into an array for the vagrant shell provisioner
-def shell_provisioner_args(yaml_arguments)
-  shell_arguments = Array.new
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
 
-  # Arguments may or may not be named,
-  # and named arguments may or may not have a value.
-  yaml_arguments.each do |argument|
-    argument.key?('name') && shell_arguments.push(argument['name'])
-    argument.key?('value') && shell_arguments.push(argument['value'])
-  end
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
 
-  shell_arguments
-end
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  # config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+  #   vb.memory = "1024"
+  # end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
 
-# convert all keys in the given hash to symbols
-# NOTE: Doesn't work with nested hashes, but I don't need this for those yet
-def keys_to_symbols(hash_in)
-  hash_out = hash_in.inject({}) do |hash_rekeyed, (key, value)|
-    hash_rekeyed[key.to_sym] = value
-    hash_rekeyed
-  end
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
 
-  hash_out
-end
-
-# Verify that vagrant.yml exists
-root_dir = File.dirname(__FILE__)
-vagrant_yaml_file = "#{root_dir}/vagrant.yml"
-error_msg = "#{vagrant_yaml_file} does not exist"
-handle_error(error_msg) unless File.exists?(vagrant_yaml_file)
-
-# Read box and node configs from vagrant.yml
-vagrant_yaml = YAML.load_file(vagrant_yaml_file)
-error_msg = "#{vagrant_yaml_file} exists, but is empty"
-handle_error(error_msg) unless vagrant_yaml
-
-boxes = vagrant_yaml['boxes']
-nodes = vagrant_yaml['nodes']
-
-# Verify that node definitions exist and are well-formed
-verify_nodes(nodes)
-
-# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
-VAGRANTFILE_API_VERSION = '2'
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Define vagrant VMs for each node defined in vagrant.yml
-  nodes.each do |node_name, node_details|
-    config.vm.define node_name do |node|
-      boot_timeout = 2000
-      # configure box name and url (if not a vagrant cloud box)
-      box_name = "#{node_details['box']}"
-      node.vm.box = "#{box_name}"
-      boxes.key?("#{box_name}") && node.vm.box_url = boxes[box_name]
-
-      # configure basic settings
-      node.vm.hostname = node_details['hostname']
-
-      # configure networks
-      networks = node_details['networks']
-      networks && networks.each do |network|
-        network.each do |network_type, network_params|
-          if network_params
-            network_params = keys_to_symbols(network_params)
-            node.vm.network network_type, network_params
-          else
-            node.vm.network network_type
-          end
-        end
-      end
-
-      # Disable rsync folders to shave some time off `vagrant up`
-      # The rsync isn't necessary because the shared vboxsf filesystem is being
-      # used.
-      node.vm.synced_folder '.', '/home/vagrant/sync', :disabled => true
-
-      # configure synced folders
-      synced_folders = node_details['synced_folders']
-      synced_folders && synced_folders.each do |synced_folder|
-        node.vm.synced_folder synced_folder['host'], synced_folder['guest']
-      end
-
-      # configure forwarded ports
-      forwarded_ports = node_details['forwarded_ports']
-      forwarded_ports && forwarded_ports.each do |forwarded_port|
-        forwarded_port = keys_to_symbols(forwarded_port)
-        node.vm.network 'forwarded_port', forwarded_port
-      end
-
-      # Configure provisioners
-      # Each key should correspond to a valid vagrant provisioner.
-      # Each value should correspond to a valid setting for that provisioner.
-      #   (Except for 'arguments', which is an array of arguments to the shell provisioner script.)
-      provisioners = node_details['provisioners']
-      provisioners && provisioners.each do |provisioner|
-        provisioner.each do |provisioner_type, provisioner_params|
-          node.vm.provision provisioner_type do |provision|
-            provisioner_params.each do |key, value|
-              if key == 'arguments'
-                provision.args = shell_provisioner_args(value)
-              else
-                provision.send("#{key}=", value)
-              end
-            end
-          end
-        end
-      end
-
-      # General provider-specific settings
-      # Each key should correspond to a valid vagrant provider
-      # Each value should be a hash of valid settings for that provider
-      providers = node_details['providers']
-      providers && providers.each do |provider_type, provider_params|
-        node.vm.provider provider_type do |node_provider|
-           provider_params.each do |key, value|
-             node_provider.send("#{key}=", value)
-           end
-        end
-      end
-
-      # Special case provider-specifc settings
-      # NOTE: memory and cpus are common enough settings that I don't treat them as
-      #       provider-specific in the .yml files
-      node.vm.provider 'virtualbox' do |vb|
-        vb.customize [ 'modifyvm', :id, '--memory', node_details['memory'] ]
-        vb.customize [ 'modifyvm', :id, '--cpus', node_details['cpus'] ]
-        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-        vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-        vb.name = node_name
-      end
-      node.vm.provider 'vmware_fusion' do |vmf|
-        vmf.vmx['memsize'] = node_details['memory']
-        vmf.vmx['numvcpus'] = node_details['cpus']
-      end
-
-    end
-  end
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
 end
