@@ -22,16 +22,3 @@ group :test do
   gem "r10k"
   gem "puppetlabs_spec_helper"
 end
-
-group :development do
-  gem "travis"
-  gem "travis-lint"
-  gem "puppet-blacksmith"
-  gem "guard-rake"
-end
-
-group :system_tests do
-  gem "beaker"
-  gem "beaker-rspec"
-  gem "beaker-puppet_install_helper"
-end
