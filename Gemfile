@@ -8,6 +8,7 @@ group :test do
   gem "rspec-puppet"
   gem "control_spec_helper", '>= 0.0.2'
   gem "metadata-json-lint"
+  gem "net-ssh"
   gem "rspec-puppet-facts"
   gem 'rubocop', '0.33.0'
   gem 'simplecov'
