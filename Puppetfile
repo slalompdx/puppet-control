@@ -6,7 +6,7 @@ mod 'ntp',
 ###############################################################################
 # General dependencies
 
-mod 'stdlib',
+mod 'stdlib'
   :git => 'https://github.com/puppetlabs/puppetlabs-stdlib.git'
 
 mod 'inifile',
