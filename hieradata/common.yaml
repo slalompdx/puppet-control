@@ -1,7 +1,9 @@
 ---
 message: "This is our common yaml file"
-ntpservers:
+ntp::servers:
  - 0.pool.ntp.org
  - 3.pool.ntp.org
+ntp::service_enable: true
+ntp::service_ensure: running
 classes:
  - ntp
