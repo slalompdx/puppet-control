@@ -3,11 +3,11 @@ Package {
 }
 
 node 'xmaster.vagrant.vm' {
-  include role::puppet::master
+  include ::role::puppet::master
 }
 
 node 'xagent.vagrant.vm' {
-  include role::base
+  include ::role::base
 }
 
 node default {

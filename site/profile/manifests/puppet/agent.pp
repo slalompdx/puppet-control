@@ -6,18 +6,18 @@ class profile::puppet::agent (
   validate_string($master, $environment)
 
   ini_setting { "puppet agent's master":
-    ensure => present,
-    path => "${::settings::confdir}/puppet.conf",
+    ensure  => present,
+    path    => "${::settings::confdir}/puppet.conf",
     section => 'agent',
     setting => 'server',
-    value => $master,
+    value   => $master,
   }
 
   ini_setting { "puppet agent's environment":
-    ensure => present,
-    path => "${::settings::confdir}/puppet.conf",
+    ensure  => present,
+    path    => "${::settings::confdir}/puppet.conf",
     section => 'agent',
     setting => 'environment',
-    value => $environment,
+    value   => $environment,
   }
 }

@@ -12,7 +12,7 @@ class profile::puppet::master (
     group => 'root',
   }
 
-  class { 'hiera':
+  class { '::hiera':
     hierarchy => [
       'nodes/%{clientcert}',
       'app_tier/%{app_tier}',
@@ -20,7 +20,7 @@ class profile::puppet::master (
       'common',
     ],
     datadir   => $profile::puppet::params::hieradir,
-    backends  => $backends,
+    backends  => $::backends,
     eyaml     => $hiera_eyaml,
     notify    => Service['pe-puppetserver'],
   }

@@ -5,7 +5,7 @@ class profile::gitlab {
   }
 
   package { 'puppet-lint':
-    ensure => present,
+    ensure   => present,
     provider => 'pe_gem',
   }
 

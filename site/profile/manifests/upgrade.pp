@@ -13,11 +13,11 @@ class profile::upgrade (
     sslverify => 'False',
   }
 
- $packages = ['pe-agent','pe-augeas','pe-facter','pe-hiera','pe-libldap','pe-libyaml','pe-openssl',
+  $packages = ['pe-agent','pe-augeas','pe-facter','pe-hiera','pe-libldap','pe-libyaml','pe-openssl',
     'pe-puppet','pe-puppet-enterprise-release','pe-ruby','pe-ruby-ldap','pe-ruby-rgen']
 
   package { $packages:
-    ensure => latest,
+    ensure  => latest,
     require => yumrepo['puppetlabs-pepackages'],
   }
 }

@@ -3,7 +3,7 @@
 # classes. This makes your code less messy
 # and follows puppet best practices.
 class profile::puppet::params {
-  $confdir = "/etc/puppetlabs/code"
+  $confdir = '/etc/puppetlabs/code'
   $hieradir = "${confdir}/environments/%{::environment}/hieradata"
   $environmentpath = "${confdir}/environments"
   case $::settings::server {
