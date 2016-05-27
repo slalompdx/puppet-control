@@ -1,7 +1,7 @@
 ---
 message: "This is our common yaml file"
 ntpservers:
- - north-america.pool.ntp.org
- - ntp.lucier.net
+ - 0.pool.ntp.org
+ - 3.pool.ntp.org
 classes:
  - ntp
