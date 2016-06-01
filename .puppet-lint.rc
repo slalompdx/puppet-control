@@ -1,7 +1,0 @@
---fail-on-warnings
---relative
---no-class_inherits_from_params_class-check
---no-80chars-check
---no-documentation-check
- #19   config.ignore_paths = ['tests', 'vendor', 'examples', 'spec', 'pkg', 'modules']
-
