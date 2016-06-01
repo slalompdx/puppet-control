@@ -143,7 +143,7 @@ DEPENDENCIES
   metadata-json-lint
   net-ssh
   puppet (~> 4.4.0)
-  puppet-lint (< 1.1.0)
+  puppet-lint
   puppet-lint-absolute_classname-check
   puppet-lint-classes_and_types_beginning_with_digits-check
   puppet-lint-leading_zero-check
