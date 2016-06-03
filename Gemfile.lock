@@ -55,7 +55,7 @@ GEM
     multi_json (1.12.1)
     multipart-post (2.0.0)
     net-ssh (3.1.1)
-    parser (2.3.1.1)
+    parser (2.3.1.2)
       ast (~> 2.2)
     powerpack (0.1.1)
     puppet (4.4.2)
@@ -167,4 +167,4 @@ DEPENDENCIES
   syck
 
 BUNDLED WITH
-   1.11.2
+   1.12.5
